@@ -1,5 +1,5 @@
-import asyncHandler from "express-async-handler";
-import Expense from "../models/Expense.js";
+import asyncHandler from 'express-async-handler';
+import Expense from '../models/Expense.js';
 
 // @desc    Create new expense
 // @route   POST /api/expenses
@@ -41,11 +41,11 @@ const updateExpense = asyncHandler(async (req, res) => {
   const expense = await Expense.findById(req.params.id);
   if (!expense) {
     res.status(404);
-    throw new Error("Expense not found");
+    throw new Error('Expense not found');
   }
   if (expense.user.toString() !== req.user._id.toString()) {
     res.status(401);
-    throw new Error("Not authorized");
+    throw new Error('Not authorized');
   }
   const { description, amount, category, date } = req.body;
   expense.description = description || expense.description;
@@ -63,14 +63,14 @@ const deleteExpense = asyncHandler(async (req, res) => {
   const expense = await Expense.findById(req.params.id);
   if (!expense) {
     res.status(404);
-    throw new Error("Expense not found");
+    throw new Error('Expense not found');
   }
   if (expense.user.toString() !== req.user._id.toString()) {
     res.status(401);
-    throw new Error("Not authorized");
+    throw new Error('Not authorized');
   }
   await expense.deleteOne();
-  res.json({ message: "Expense removed" });
+  res.json({ message: 'Expense removed' });
 });
 
 // @desc    Get total spending summary
@@ -78,11 +78,11 @@ const deleteExpense = asyncHandler(async (req, res) => {
 // @access  Private
 export const getExpenseSummary = asyncHandler(async (req, res) => {
   // for admins: no filter; otherwise only their own
-  const match = req.user.role === "admin" ? {} : { user: req.user._id };
+  const match = req.user.role === 'admin' ? {} : { user: req.user._id };
 
   const [result] = await Expense.aggregate([
     { $match: match },
-    { $group: { _id: null, totalSpending: { $sum: "$amount" } } },
+    { $group: { _id: null, totalSpending: { $sum: '$amount' } } },
   ]);
 
   res.json({
@@ -95,7 +95,7 @@ export const getExpenseSummary = asyncHandler(async (req, res) => {
 // @access  Private
 export const getMonthlySpending = asyncHandler(async (req, res) => {
   // Admins see everyone’s; users see only their own
-  const match = req.user.role === "admin" ? {} : { user: req.user._id };
+  const match = req.user.role === 'admin' ? {} : { user: req.user._id };
 
   const results = await Expense.aggregate([
     { $match: match },
@@ -103,18 +103,18 @@ export const getMonthlySpending = asyncHandler(async (req, res) => {
       // group by year/month
       $group: {
         _id: {
-          year: { $year: "$date" },
-          month: { $month: "$date" },
+          year: { $year: '$date' },
+          month: { $month: '$date' },
         },
-        total: { $sum: "$amount" },
+        total: { $sum: '$amount' },
       },
     },
     {
       // reshape for output
       $project: {
         _id: 0,
-        year: "$_id.year",
-        month: "$_id.month",
+        year: '$_id.year',
+        month: '$_id.month',
         total: 1,
       },
     },

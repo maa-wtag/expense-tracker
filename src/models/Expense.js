@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 const expenseSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     description: { type: String, required: true },
     amount: { type: Number, required: true },
     category: { type: String, required: true },
@@ -9,4 +9,4 @@ const expenseSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-export default mongoose.model("Expense", expenseSchema);
+export default mongoose.model('Expense', expenseSchema);

@@ -1,6 +1,6 @@
-import asyncHandler from "express-async-handler";
-import User from "../models/User.js";
-import generateToken from "../utils/generateToken.js";
+import asyncHandler from 'express-async-handler';
+import User from '../models/User.js';
+import generateToken from '../utils/generateToken.js';
 
 // @desc    Register new user
 // @route   POST /api/auth/register
@@ -10,7 +10,7 @@ const registerUser = asyncHandler(async (req, res) => {
   const userExists = await User.findOne({ email });
   if (userExists) {
     res.status(400);
-    throw new Error("User already exists");
+    throw new Error('User already exists');
   }
   const user = await User.create({ name, email, password });
   if (user) {
@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(400);
-    throw new Error("Invalid user data");
+    throw new Error('Invalid user data');
   }
 });
 
@@ -41,7 +41,7 @@ const authUser = asyncHandler(async (req, res) => {
     });
   } else {
     res.status(401);
-    throw new Error("Invalid email or password");
+    throw new Error('Invalid email or password');
   }
 });
 
