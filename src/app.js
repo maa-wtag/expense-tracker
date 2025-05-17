@@ -8,7 +8,20 @@ import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 
 const app = express();
 app.use(helmet());
-app.use(cors());
+// CORS configuration
+const allowedOrigins = [process.env.CLIENT_URL];
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(morgan("dev"));
 
