@@ -1,4 +1,5 @@
 import express from "express";
+import passport from "../config/passport.js";
 import {
   createExpense,
   getExpenses,
@@ -7,11 +8,13 @@ import {
   getExpenseSummary,
   getMonthlySpending,
 } from "../controllers/expenseController.js";
-import { protect } from "../middleware/authMiddleware.js";
 const router = express.Router();
-router.route("/").post(protect, createExpense).get(protect, getExpenses);
-router.route("/:id").put(protect, updateExpense).delete(protect, deleteExpense);
-router.route("/summary").get(protect, getExpenseSummary);
-router.route("/monthly").get(protect, getMonthlySpending);
+
+// Protect all expense routes with Passport JWT
+const auth = passport.authenticate("jwt", { session: false });
+router.route("/").post(auth, createExpense).get(auth, getExpenses);
+router.route("/:id").put(auth, updateExpense).delete(auth, deleteExpense);
+router.get("/summary", auth, getExpenseSummary);
+router.get("/monthly", auth, getMonthlySpending);
 
 export default router;

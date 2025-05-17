@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
+import "./config/passport.js";
 import app from "./app.js";
 dotenv.config();
 
