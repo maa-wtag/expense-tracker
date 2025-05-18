@@ -12,3 +12,10 @@
 - `npm start` - production server
 - `npm run dev` - development with nodemon
 - `npm test` - run tests
+
+## Docker
+Build and start services:
+```bash
+docker-compose up --build
+```
+API accessible at http://localhost:4500
