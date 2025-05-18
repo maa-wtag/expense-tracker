@@ -5,8 +5,10 @@ import morgan from "morgan";
 import authRoutes from "./routes/authRoutes.js";
 import expenseRoutes from "./routes/expenseRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import { applySecurity } from "./config/security.js";
 
 const app = express();
+applySecurity(app);
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
