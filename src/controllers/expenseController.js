@@ -1,10 +1,8 @@
 import asyncHandler from "express-async-handler";
 import Expense from "../models/Expense.js";
 
-// @desc    Create new expense
-// @route   POST /api/expenses
-// @access  Private
-const createExpense = asyncHandler(async (req, res) => {
+// Create new expense (any authenticated user)
+export const createExpense = asyncHandler(async (req, res) => {
   const { description, amount, category, date } = req.body;
   const expense = await Expense.create({
     user: req.user._id,
@@ -16,12 +14,10 @@ const createExpense = asyncHandler(async (req, res) => {
   res.status(201).json(expense);
 });
 
-// @desc    Get all expenses for user
-// @route   GET /api/expenses
-// @access  Private
-const getExpenses = asyncHandler(async (req, res) => {
+// Get expenses: users get only their own, admins get all
+export const getExpenses = asyncHandler(async (req, res) => {
   const { category, startDate, endDate, page = 1, limit = 10 } = req.query;
-  const filter = { user: req.user._id };
+  const filter = req.user.role === "admin" ? {} : { user: req.user._id };
   if (category) filter.category = category;
   if (startDate || endDate) filter.date = {};
   if (startDate) filter.date.$gte = new Date(startDate);
@@ -34,38 +30,34 @@ const getExpenses = asyncHandler(async (req, res) => {
   res.json(expenses);
 });
 
-// @desc    Update an expense
-// @route   PUT /api/expenses/:id
-// @access  Private
-const updateExpense = asyncHandler(async (req, res) => {
+// Update expense: owners or admin
+export const updateExpense = asyncHandler(async (req, res) => {
   const expense = await Expense.findById(req.params.id);
   if (!expense) {
     res.status(404);
     throw new Error("Expense not found");
   }
-  if (expense.user.toString() !== req.user._id.toString()) {
+  const isOwner = expense.user.toString() === req.user._id.toString();
+  if (!isOwner && req.user.role !== "admin") {
     res.status(401);
     throw new Error("Not authorized");
   }
-  const { description, amount, category, date } = req.body;
-  expense.description = description || expense.description;
-  expense.amount = amount || expense.amount;
-  expense.category = category || expense.category;
-  expense.date = date || expense.date;
+  ["description", "amount", "category", "date"].forEach((field) => {
+    if (req.body[field] !== undefined) expense[field] = req.body[field];
+  });
   const updated = await expense.save();
   res.json(updated);
 });
 
-// @desc    Delete an expense
-// @route   DELETE /api/expenses/:id
-// @access  Private
-const deleteExpense = asyncHandler(async (req, res) => {
+// Delete expense: owners or admin
+export const deleteExpense = asyncHandler(async (req, res) => {
   const expense = await Expense.findById(req.params.id);
   if (!expense) {
     res.status(404);
     throw new Error("Expense not found");
   }
-  if (expense.user.toString() !== req.user._id.toString()) {
+  const isOwner = expense.user.toString() === req.user._id.toString();
+  if (!isOwner && req.user.role !== "admin") {
     res.status(401);
     throw new Error("Not authorized");
   }
@@ -73,9 +65,6 @@ const deleteExpense = asyncHandler(async (req, res) => {
   res.json({ message: "Expense removed" });
 });
 
-// @desc    Get total spending summary
-// @route   GET /api/expenses/summary
-// @access  Private
 export const getExpenseSummary = asyncHandler(async (req, res) => {
   // for admins: no filter; otherwise only their own
   const match = req.user.role === "admin" ? {} : { user: req.user._id };
@@ -123,5 +112,3 @@ export const getMonthlySpending = asyncHandler(async (req, res) => {
 
   res.json(results);
 });
-
-export { createExpense, getExpenses, updateExpense, deleteExpense };
