@@ -1,5 +1,8 @@
 # Expense Tracker API
 
+## Requirement
+[Doc](https://docs.google.com/document/d/1e8dL2T3saR5wwXM3Oy0s0SxMRmEuPnNM6321aED_tlM/edit?tab=t.0#heading=h.oo365h5u7qc4)
+
 ## Setup
 1. Copy `.env.example` to `.env` and fill in values.
 2. `npm install`
